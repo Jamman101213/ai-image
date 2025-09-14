@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixlr AI Generator</title>
+<style>
+  body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; flex-direction:column; align-items:center; padding:50px; }
+  input, button { padding:10px; font-size:16px; margin:10px; }
+  img { margin-top:20px; max-width:80%; border-radius:10px; }
+</style>
+</head>
+<body>
+<h1>Pixlr AI Image Generator</h1>
+<input type="text" id="prompt" placeholder="Type your prompt...">
+<button onclick="generateImage()">Generate</button>
+<img id="result" src="" alt="Generated image will appear here">
+
+<script>
+async function generateImage() {
+  const prompt = document.getElementById("prompt").value;
+  if (!prompt) return alert("Enter a prompt!");
+
+  try {
+    const res = await fetch("https://my-pixlr.vercel.app/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+
+    if (data.url) {
+      document.getElementById("result").src = data.url;
+    } else {
+      alert("Failed to generate image: " + JSON.stringify(data));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error generating image. Check console.");
+  }
+}
+</script>
+</body>
+</html>
