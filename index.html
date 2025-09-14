@@ -115,7 +115,16 @@
 <img id="result" src="" alt="Generated image will appear here" />
 
 <script>
-const FRONTEND_KEY = "81dmwizkcniqlzkf"; // must match your API key
+const FRONTEND_KEY = "81dmwizkcniqlzkf"; // must match your backend
+
+async function fetchPixlrKeys() {
+  const res = await fetch("https://ai-image-pink-nu.vercel.app/api/getKey", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Frontend-Key": FRONTEND_KEY }
+  });
+  if (!res.ok) throw new Error(`Failed to fetch keys: ${res.status}`);
+  return res.json(); // { clientKey, clientSecret }
+}
 
 async function generateImage() {
   const prompt = document.getElementById("prompt").value.trim();
@@ -138,26 +147,28 @@ async function generateImage() {
   spinner.style.display = "block";
 
   try {
-    const res = await fetch("https://ai-image-pink-nu.vercel.app/api/generate", {
+    const { clientKey, clientSecret } = await fetchPixlrKeys();
+
+    const pixlrRes = await fetch("https://api.pixlr.com/v1/ai/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Frontend-Key": FRONTEND_KEY
+        "Authorization": "Basic " + btoa(`${clientKey}:${clientSecret}`)
       },
       body: JSON.stringify({ prompt, width, height, style })
     });
 
-    const data = await res.json();
+    const data = await pixlrRes.json();
 
-    if (res.ok && data.url) {
+    if (pixlrRes.ok && data.url) {
       img.src = data.url;
     } else {
-      console.error("API error:", data);
-      errorDiv.textContent = `Failed to generate image. Error ${data.status || "unknown"}: ${data.error}`;
+      console.error("Pixlr API error:", data);
+      errorDiv.textContent = `Failed to generate image. Error ${data.status || "unknown"}: ${data.error || JSON.stringify(data)}`;
     }
   } catch (err) {
-    console.error("Fetch error:", err);
-    errorDiv.textContent = "Error connecting to the server.";
+    console.error("Error:", err);
+    errorDiv.textContent = "Error connecting to the server or fetching keys.";
   } finally {
     spinner.style.display = "none";
   }
