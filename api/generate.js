@@ -9,9 +9,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight request
   if (req.method === "OPTIONS") return res.status(200).end();
-
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   const { prompt } = req.body;
@@ -25,8 +23,8 @@ export default async function handler(req, res) {
       {
         params: {
           grant_type: "client_credentials",
-          client_id: 68c71eb4b9af5c8bf598a7ea,
-          client_secret: 35c3da5bf37443439c06f38f1d846192,
+          client_id: "68c71eb4b9af5c8bf598a7ea",   // ✅ use quotes or variable
+          client_secret: "35c3da5bf37443439c06f38f1d846192", // ✅ use quotes or variable
         },
       }
     );
