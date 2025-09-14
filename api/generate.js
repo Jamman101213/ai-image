@@ -6,7 +6,7 @@ const CLIENT_SECRET = "35c3da5bf37443439c06f38f1d846192";
 
 export default async function handler(req, res) {
   // Allow your frontend domain
-  res.setHeader("Access-Control-Allow-Origin", "*"); // or replace "*" with your frontend URL
+  res.setHeader("Access-Control-Allow-Origin", "https://ai-image-pink-nu.vercel.app/"); // or replace "*" with your frontend URL
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
     // Generate image
     const pixlrRes = await axios.post(
-      "https://api.pixlr.com/v1/ai/generate",
+      "https://ai-image-pink-nu.vercel.app/api/generate",
       { prompt },
       { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
     );
