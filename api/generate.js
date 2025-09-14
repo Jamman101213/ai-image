@@ -1,9 +1,19 @@
+// api/generate.js
 import axios from "axios";
 
 const CLIENT_KEY = "68c71eb4b9af5c8bf598a7ea";
 const CLIENT_SECRET = "35c3da5bf37443439c06f38f1d846192";
 
 export default async function handler(req, res) {
+  // Allow your frontend domain
+  res.setHeader("Access-Control-Allow-Origin", "*"); // or replace "*" with your frontend URL
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end(); // Handle preflight
+  }
+
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   const { prompt } = req.body;
@@ -16,8 +26,8 @@ export default async function handler(req, res) {
       {
         params: {
           grant_type: "client_credentials",
-          client_id: 68c71eb4b9af5c8bf598a7ea,
-          client_secret: 35c3da5bf37443439c06f38f1d846192,
+          client_id: CLIENT_KEY,
+          client_secret: CLIENT_SECRET,
         },
       }
     );
