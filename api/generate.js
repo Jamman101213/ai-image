@@ -4,7 +4,7 @@ const CLIENT_KEY = "68c71eb4b9af5c8bf598a7ea";
 const CLIENT_SECRET = "35c3da5bf37443439c06f38f1d846192";
 
 export default async function handler(req, res) {
-  // Allow only your frontend to call
+  // Allow your frontend domain
   res.setHeader("Access-Control-Allow-Origin", "https://ai-image-pink-nu.vercel.app");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -16,32 +16,36 @@ export default async function handler(req, res) {
   if (!prompt) return res.status(400).json({ error: "Prompt is required" });
 
   try {
-    // Get Pixlr access token
+    // 1️⃣ Get Pixlr access token
     const tokenRes = await axios.post(
       "https://api.pixlr.com/oauth/token",
       null,
       {
         params: {
           grant_type: "client_credentials",
-          client_id: "68c71eb4b9af5c8bf598a7ea",   // ✅ use quotes or variable
-          client_secret: "35c3da5bf37443439c06f38f1d846192", // ✅ use quotes or variable
+          client_id: CLIENT_KEY,
+          client_secret: CLIENT_SECRET,
         },
       }
     );
 
     const token = tokenRes.data.access_token;
 
-    // Call Pixlr AI generate endpoint
+    // 2️⃣ Call Pixlr AI generate endpoint
     const pixlrRes = await axios.post(
       "https://api.pixlr.com/v1/ai/generate",
-      { prompt },
+      { prompt }, // make sure Pixlr accepts only { prompt } or add extra fields like width/height
       { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
     );
 
     res.status(200).json(pixlrRes.data);
 
   } catch (err) {
-    console.error("Pixlr API error:", err.response?.data || err.message);
-    res.status(500).json({ error: err.response?.data || err.message });
+    // Log full error for debugging
+    console.error("Pixlr API error:", err.response?.status, err.response?.data || err.message);
+    res.status(500).json({
+      error: err.response?.data || err.message,
+      status: err.response?.status
+    });
   }
 }
