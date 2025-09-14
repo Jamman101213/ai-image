@@ -21,7 +21,7 @@ async function generateImage() {
   if (!prompt) return alert("Enter a prompt!");
 
   try {
-    const res = await fetch("https://my-pixlr.vercel.app/api/generate", {
+    const res = await fetch("https://ai-image-pink.vercel.app/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt })
