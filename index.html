@@ -115,17 +115,6 @@
 <img id="result" src="" alt="Generated image will appear here" />
 
 <script>
-const FRONTEND_KEY = "81dmwizkcniqlzkf"; // must match your backend
-
-async function fetchPixlrKeys() {
-  const res = await fetch("https://ai-image-pink-nu.vercel.app/api/getKey", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Frontend-Key": FRONTEND_KEY }
-  });
-  if (!res.ok) throw new Error(`Failed to fetch keys: ${res.status}`);
-  return res.json(); // { clientKey, clientSecret }
-}
-
 async function generateImage() {
   const prompt = document.getElementById("prompt").value.trim();
   const width = parseInt(document.getElementById("width").value) || 512;
@@ -138,37 +127,28 @@ async function generateImage() {
 
   errorDiv.textContent = "";
   img.src = "";
-
-  if (!prompt) {
-    errorDiv.textContent = "Please enter a prompt!";
-    return;
-  }
+  if (!prompt) { errorDiv.textContent = "Please enter a prompt!"; return; }
 
   spinner.style.display = "block";
 
   try {
-    const { clientKey, clientSecret } = await fetchPixlrKeys();
-
-    const pixlrRes = await fetch("https://api.pixlr.com/v1/ai/generate", {
+    const res = await fetch("https://ai-image-pink-nu.vercel.app/api/generate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Basic " + btoa(`${clientKey}:${clientSecret}`)
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, width, height, style })
     });
 
-    const data = await pixlrRes.json();
+    const data = await res.json();
 
-    if (pixlrRes.ok && data.url) {
+    if (res.ok && data.url) {
       img.src = data.url;
     } else {
-      console.error("Pixlr API error:", data);
-      errorDiv.textContent = `Failed to generate image. Error ${data.status || "unknown"}: ${data.error || JSON.stringify(data)}`;
+      console.error("Backend error:", data);
+      errorDiv.textContent = `Failed to generate image. Error ${data.status || "unknown"}: ${data.error}`;
     }
   } catch (err) {
-    console.error("Error:", err);
-    errorDiv.textContent = "Error connecting to the server or fetching keys.";
+    console.error("Fetch error:", err);
+    errorDiv.textContent = "Error connecting to the server.";
   } finally {
     spinner.style.display = "none";
   }
