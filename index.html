@@ -11,9 +11,9 @@
 </head>
 <body>
 <h1>Pixlr AI Image Generator</h1>
-<input type="text" id="prompt" placeholder="Type your prompt...">
+<input type="text" id="prompt" placeholder="Type your prompt..." size="50">
 <button onclick="generateImage()">Generate</button>
-<img id="result" src="" alt="Generated image will appear here">
+<img id="result" src="" alt="Generated image">
 
 <script>
 async function generateImage() {
@@ -26,6 +26,7 @@ async function generateImage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt })
     });
+
     const data = await res.json();
 
     if (data.url) {
