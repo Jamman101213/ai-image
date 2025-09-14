@@ -6,7 +6,174 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    background-color: #1e1e1e;
+    background-color: #1e1e1e;<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pixlr AI Image Generator</title>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    color: #4CAF50;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  input, select {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+  }
+
+  button {
+    padding: 12px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+  }
+
+  img {
+    margin-top: 25px;
+    max-width: 90%;
+    border-radius: 12px;
+    border: 2px solid #4CAF50;
+    box-shadow: 0 0 15px #4CAF50;
+  }
+
+  .error {
+    margin-top: 15px;
+    color: #ff4d4d;
+    font-weight: bold;
+  }
+
+  .spinner {
+    margin-top: 20px;
+    border: 6px solid #2c2c2c;
+    border-top: 6px solid #4CAF50;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+<h1>Pixlr AI Image Generator</h1>
+
+<div class="input-group">
+  <input type="text" id="prompt" placeholder="Enter your prompt here..." />
+  <label>
+    Width:
+    <input type="number" id="width" placeholder="512" value="512" min="128" max="1024" />
+  </label>
+  <label>
+    Height:
+    <input type="number" id="height" placeholder="512" value="512" min="128" max="1024" />
+  </label>
+  <label>
+    Style:
+    <select id="style">
+      <option value="realistic">Realistic</option>
+      <option value="cartoon">Cartoon</option>
+      <option value="anime">Anime</option>
+      <option value="fantasy">Fantasy</option>
+    </select>
+  </label>
+  <button onclick="generateImage()">Generate Image</button>
+</div>
+
+<div class="spinner" id="spinner"></div>
+<div class="error" id="error"></div>
+<img id="result" src="" alt="Generated image will appear here" />
+
+<script>
+const FRONTEND_KEY = "my-secure-frontend-key"; // same key as API
+
+async function generateImage() {
+  const prompt = document.getElementById("prompt").value.trim();
+  const width = parseInt(document.getElementById("width").value) || 512;
+  const height = parseInt(document.getElementById("height").value) || 512;
+  const style = document.getElementById("style").value;
+
+  const errorDiv = document.getElementById("error");
+  const img = document.getElementById("result");
+  const spinner = document.getElementById("spinner");
+
+  errorDiv.textContent = "";
+  img.src = "";
+
+  if (!prompt) {
+    errorDiv.textContent = "Please enter a prompt!";
+    return;
+  }
+
+  spinner.style.display = "block";
+
+  try {
+    const res = await fetch("https://ai-image-pink-nu.vercel.app/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Frontend-Key": FRONTEND_KEY
+      },
+      body: JSON.stringify({ prompt, width, height, style })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.url) {
+      img.src = data.url;
+    } else {
+      console.error("API error:", data);
+      errorDiv.textContent = `Failed to generate image. Error ${data.status || "unknown"}: ${data.error}`;
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+    errorDiv.textContent = "Error connecting to the server.";
+  } finally {
+    spinner.style.display = "none";
+  }
+}
+</script>
+</body>
+</html>
+
     color: #fff;
     display: flex;
     flex-direction: column;
